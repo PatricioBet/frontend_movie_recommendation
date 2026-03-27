@@ -228,11 +228,11 @@ export default function Home() {
         </h1>
         <div className="bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2 rounded-full shadow-lg inline-block">
           <p className="text-gray-300 text-[11px] md:text-xs font-semibold tracking-wider flex items-center gap-3">
-            <span>Right Swipe {'>'} <span className="text-green-400 ml-1">💚 Me Gusta</span></span>
+            <span>Desliza a la derecha {'>'} <span className="text-green-400 ml-1">💚 Me Gusta</span></span>
             <span className="text-gray-600">|</span>
-            <span>{'<'} Left Swipe <span className="text-red-400 ml-1">❌ Paso</span></span>
+            <span>{'<'} Desliza a la izquierda <span className="text-red-400 ml-1">❌ Paso</span></span>
             <span className="text-gray-600">|</span>
-            <span>^ Up Swipe <span className="text-gray-400 font-normal ml-1">👁️ No vista</span></span>
+            <span>^ Desliza hacia arriba <span className="text-gray-400 font-normal ml-1">👁️ No vista</span></span>
           </p>
         </div>
         <div className="mt-8 flex justify-center gap-2">
