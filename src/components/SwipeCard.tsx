@@ -22,6 +22,31 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
   const [posterUrl, setPosterUrl] = useState<string | null>(movie.poster_url);
+  const [isHinting, setIsHinting] = useState(false);
+
+  useEffect(() => {
+    let inactivityTimer: ReturnType<typeof setInterval>;
+
+    const playHintAnimation = () => {
+      if (isDragging) return;
+      setIsHinting(true);
+      setTimeout(() => setIsHinting(false), 800);
+    };
+
+    const initialTimeout = setTimeout(playHintAnimation, 1000);
+
+    const resetTimer = () => {
+      clearInterval(inactivityTimer);
+      inactivityTimer = setInterval(playHintAnimation, 5000);
+    };
+
+    resetTimer();
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(inactivityTimer);
+    };
+  }, [isDragging]);
 
   useEffect(() => {
     setPos({ x: 0, y: 0 });
@@ -75,19 +100,20 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
   };
 
   return (
-    <div
-      className="relative w-full max-w-[340px] md:max-w-[380px] rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden bg-white/20 backdrop-blur-2xl border border-white/30 touch-none select-none"
-      style={{
-        transform: `translate3d(${x}px, ${y}px, 0) rotate(${x / 20}deg)`,
-        cursor: isDragging ? 'grabbing' : 'grab',
-        transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-      }}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-    >
-      <div className="h-[25rem] sm:h-[28rem] w-full relative">
+    <div className={`relative w-full max-w-[340px] md:max-w-[380px] z-10 transition-transform ${isHinting ? 'animate-card-hint' : ''}`}>
+      <div
+        className="relative w-full rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden bg-white/20 backdrop-blur-2xl border border-white/30 touch-none select-none"
+        style={{
+          transform: `translate3d(${x}px, ${y}px, 0) rotate(${x / 20}deg)`,
+          cursor: isDragging ? 'grabbing' : 'grab',
+          transition: isDragging ? 'none' : 'transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+        }}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+      >
+        <div className="h-[25rem] sm:h-[28rem] w-full relative">
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-transparent to-transparent z-10 pointer-events-none"></div>
         {posterUrl ? (
           <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover pointer-events-none border-b-0" />
@@ -114,6 +140,7 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
       </div>
       <div className={`absolute bottom-32 left-0 right-0 mx-auto w-56 text-center border-[3px] border-gray-300 text-gray-300 text-2xl font-black px-4 py-2 rounded-xl transition-opacity duration-200 ${y < -50 && Math.abs(x) < 50 ? 'opacity-100' : 'opacity-0'} pointer-events-none bg-gray-900/60 backdrop-blur-sm z-30`}>
         NO LA HE VISTO
+      </div>
       </div>
     </div>
   );

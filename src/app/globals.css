@@ -24,3 +24,14 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes card-hint {
+  0%, 100% { transform: rotate(0deg) translateX(0); }
+  25% { transform: rotate(3deg) translateX(15px); }
+  50% { transform: rotate(-2deg) translateX(-10px); }
+  75% { transform: rotate(1deg) translateX(5px); }
+}
+
+.animate-card-hint {
+  animation: card-hint 0.7s cubic-bezier(0.25, 1, 0.5, 1);
+}
