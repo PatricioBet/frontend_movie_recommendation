@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_FRONTEND_URL || "https://frontend.144.225.147.46.nip.io"),
   title: "Star Recs",
   description: "Recomendación de películas - Potenciado con modelo de Machine Learning. Descubre tus próximas películas favoritas.",
   keywords: ["películas", "recomendaciones", "IA", "machine learning", "cine", "Star Recs", "Inteligencia Artificial"],
