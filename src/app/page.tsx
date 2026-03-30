@@ -1,13 +1,42 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import SwipeCard, { Movie } from "@/components/SwipeCard";
 
 const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 const API_URL = rawApiUrl.endsWith("/") ? rawApiUrl.slice(0, -1) : rawApiUrl;
 
-function RecommendationCard({ movie }: { movie: Movie }) {
+export interface ExtendedMovie extends Movie {
+  good_rating_count?: number;
+  bad_rating_count?: number;
+}
+
+interface RecommendationCardProps {
+  key?: React.Key | null;
+  movie: ExtendedMovie;
+  isTrending?: boolean;
+}
+
+function RecommendationCard({ movie, isTrending = false }: RecommendationCardProps) {
   const [posterUrl, setPosterUrl] = useState<string | null>(movie.poster_url);
+  const [rated, setRated] = useState<boolean>(false);
+  
+  const totalRatings = (movie.good_rating_count || 0) + (movie.bad_rating_count || 0);
+  const acceptancePercent = totalRatings > 0 ? Math.round(((movie.good_rating_count || 0) / totalRatings) * 100) : 0;
+
+  const handleRateRec = async (isGood: boolean) => {
+    if (rated) return;
+    try {
+      await fetch(`${API_URL}/movies/${movie.id}/recommendation-rating/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_good: isGood }),
+      });
+      setRated(true);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   useEffect(() => {
     if (!movie.poster_url && movie.title) {
@@ -40,18 +69,48 @@ function RecommendationCard({ movie }: { movie: Movie }) {
          )}
          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/40 to-transparent"></div>
       </div>
-      <div className="p-6 relative -mt-16 z-10">
+      <div className="p-6 relative -mt-16 z-10 flex flex-col h-full">
         <h3 className="text-2xl font-black text-white drop-shadow-md leading-tight">{movie.title} {movie.year && <span className="text-sm font-medium text-gray-400">({movie.year})</span>}</h3>
+        
+        {isTrending && totalRatings > 0 && (
+           <div className="mt-2 inline-flex items-center bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 shadow-sm">
+             <span className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-cyan-400">
+                {acceptancePercent}% Aceptación
+             </span>
+             <span className="text-xs text-gray-400 ml-2">({totalRatings} valoraciones)</span>
+           </div>
+        )}
         <p className="text-sm font-semibold text-cyan-400 mt-1 drop-shadow-sm">{movie.genres}</p>
         <p className="text-gray-300 mt-3 text-sm line-clamp-3 leading-relaxed">{movie.description || "Descripción no disponible para este título."}</p>
-        <a 
-          href={`https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer español')}`} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="mt-5 block w-full text-center bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_20px_rgba(236,72,153,0.6)] hover:scale-[1.02] transition-all active:scale-95"
-        >
-          Ver Tráiler
-        </a>
+        <div className="mt-auto pt-4 space-y-3">
+          <a 
+            href={`https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer español')}`} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="block w-full text-center bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_20px_rgba(236,72,153,0.6)] hover:scale-[1.02] transition-all active:scale-95"
+          >
+            Ver Tráiler
+          </a>
+          
+          {!isTrending && (
+            <div className="flex gap-2 w-full mt-3">
+              <button 
+                onClick={() => handleRateRec(false)} 
+                disabled={rated}
+                className={`flex-1 py-2 rounded-xl font-bold transition-all ${rated ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700' : 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 active:scale-95'}`}
+              >
+                👎 Mala
+              </button>
+              <button 
+                onClick={() => handleRateRec(true)} 
+                disabled={rated}
+                className={`flex-1 py-2 rounded-xl font-bold transition-all ${rated ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700' : 'bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500/20 hover:border-green-500/50 active:scale-95'}`}
+              >
+                👍 Buena
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -61,7 +120,8 @@ export default function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userId, setUserId] = useState<number | null>(null);
-  const [recommendations, setRecommendations] = useState<Movie[]>([]);
+  const [recommendations, setRecommendations] = useState<ExtendedMovie[]>([]);
+  const [trendingMovies, setTrendingMovies] = useState<ExtendedMovie[]>([]);
   const [fetchingRecs, setFetchingRecs] = useState(false);
   const [ratingsCount, setRatingsCount] = useState(0);
   const [showInfo, setShowInfo] = useState(true);
@@ -139,12 +199,21 @@ export default function Home() {
     setFetchingRecs(true);
     try {
         await new Promise(res => setTimeout(res, 2000));
-        const res = await fetch(`${API_URL}/users/${userId}/recommendations`);
-        if (res.ok) {
-            const data = await res.json();
+        const [recRes, trendRes] = await Promise.all([
+          fetch(`${API_URL}/users/${userId}/recommendations`),
+          fetch(`${API_URL}/movies/trending`)
+        ]);
+
+        if (recRes.ok) {
+            const data = await recRes.json();
             setRecommendations(data);
         } else {
             setRecommendations([{id: 100, title: 'Recomendación AI 1', genres: 'Sci-Fi', poster_url: '', description: '...', year: 2026}]);
+        }
+        
+        if (trendRes.ok) {
+            const trendData = await trendRes.json();
+            setTrendingMovies(trendData);
         }
     } catch (err) {
       console.error("Failed to fetch recommendations", err);
@@ -168,15 +237,32 @@ export default function Home() {
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
         
-        <div className="relative z-10 max-w-7xl mx-auto">
-          <h1 className="text-4xl md:text-6xl font-black mb-10 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.4)] tracking-tight">
-            Tus Mejores Recomendaciones
-          </h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {recommendations.map((mov) => (
-              <RecommendationCard key={mov.id} movie={mov} />
-            ))}
+        <div className="relative z-10 max-w-[1400px] mx-auto flex flex-col xl:flex-row gap-12">
+          {/* Section 1: Recommendations */}
+          <div className="flex-1">
+             <h1 className="text-4xl md:text-5xl font-black mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.4)] tracking-tight">
+               Tus Mejores Recomendaciones
+             </h1>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+               {recommendations.map((mov: ExtendedMovie) => (
+                 <RecommendationCard key={mov.id} movie={mov} />
+               ))}
+             </div>
           </div>
+          
+          {/* Section 2: Trending */}
+          {trendingMovies.length > 0 && (
+          <div className="w-full xl:w-[450px] shrink-0 border-t xl:border-t-0 xl:border-l border-white/10 pt-10 xl:pt-0 xl:pl-10">
+             <h2 className="text-3xl font-black mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-500 drop-shadow-[0_0_15px_rgba(56,189,248,0.4)] tracking-tight flex items-center gap-3">
+               🔥 En Tendencia
+             </h2>
+             <div className="flex flex-col gap-8">
+                {trendingMovies.map((mov: ExtendedMovie) => (
+                  <RecommendationCard key={mov.id} movie={mov} isTrending={true} />
+                ))}
+             </div>
+          </div>
+          )}
         </div>
       </div>
     );
