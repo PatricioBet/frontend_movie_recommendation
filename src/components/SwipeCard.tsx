@@ -113,7 +113,7 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
-        <div className="h-[25rem] sm:h-[28rem] w-full relative">
+        <div className="h-[40vh] min-h-[16rem] max-h-[25rem] sm:max-h-[28rem] w-full relative">
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-transparent to-transparent z-10 pointer-events-none"></div>
         {posterUrl ? (
           <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover pointer-events-none border-b-0" />

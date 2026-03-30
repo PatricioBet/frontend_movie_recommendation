@@ -198,7 +198,7 @@ export default function Home() {
   const currentMovie = movies[currentIndex];
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center overflow-hidden relative font-sans">
+    <div className="h-[100dvh] bg-slate-950 flex flex-col items-center justify-between overflow-hidden relative font-sans pt-6 pb-6 md:pt-10 md:pb-8">
       
       {/* Ambient background glows */}
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-pink-500/10 rounded-full blur-[100px] pointer-events-none"></div>
@@ -222,27 +222,29 @@ export default function Home() {
         </div>
       )}
 
-      <div className="absolute top-8 md:top-12 text-center w-full px-4 z-20 flex flex-col items-center">
-        <h1 className="text-4xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)] mb-4 tracking-tight">
+      {/* Top Header Area */}
+      <div className="w-full px-2 md:px-4 z-20 flex flex-col items-center shrink-0">
+        <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)] mb-3 md:mb-4 tracking-tight text-center leading-tight">
           Descubre Películas
         </h1>
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 px-5 py-2 rounded-full shadow-lg inline-block">
-          <p className="text-gray-300 text-[11px] md:text-xs font-semibold tracking-wider flex items-center gap-3">
-            <span>Desliza a la derecha {'>'} <span className="text-green-400 ml-1">💚 Me Gusta</span></span>
-            <span className="text-gray-600">|</span>
-            <span>{'<'} Desliza a la izquierda <span className="text-red-400 ml-1">❌ Paso</span></span>
-            <span className="text-gray-600">|</span>
-            <span>^ Desliza hacia arriba <span className="text-gray-400 font-normal ml-1">👁️ No vista</span></span>
+        <div className="bg-white/5 backdrop-blur-md border border-white/10 px-3 md:px-5 py-2 rounded-full shadow-lg inline-block max-w-[95%] text-center">
+          <p className="text-gray-300 text-[10px] md:text-xs font-semibold tracking-wider flex items-center justify-center gap-1.5 md:gap-3 flex-wrap leading-relaxed">
+            <span className="whitespace-nowrap">Derecha {'>'} <span className="text-green-400 ml-0.5">💚</span></span>
+            <span className="text-gray-600 hidden sm:inline">|</span><span className="text-gray-600 sm:hidden">&bull;</span>
+            <span className="whitespace-nowrap">{'<'} Izquierda <span className="text-red-400 ml-0.5">❌</span></span>
+            <span className="text-gray-600 hidden sm:inline">|</span><span className="text-gray-600 sm:hidden">&bull;</span>
+            <span className="whitespace-nowrap">^ Arriba <span className="text-gray-400 font-normal ml-0.5">👁️</span></span>
           </p>
         </div>
-        <div className="mt-8 flex justify-center gap-2">
+        <div className="mt-4 md:mt-8 flex justify-center gap-1.5 md:gap-2">
           {Array.from({ length: 10 }).map((_, idx) => (
-            <div key={idx} className={`h-1.5 rounded-full transition-all duration-500 ${idx === ratingsCount ? 'w-8 bg-gradient-to-r from-cyan-400 to-pink-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]' : idx < ratingsCount ? 'w-3 bg-white/50' : 'w-3 bg-white/10'}`}></div>
+            <div key={idx} className={`h-1.5 rounded-full transition-all duration-500 ${idx === ratingsCount ? 'w-6 md:w-8 bg-gradient-to-r from-cyan-400 to-pink-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]' : idx < ratingsCount ? 'w-2.5 md:w-3 bg-white/50' : 'w-2.5 md:w-3 bg-white/10'}`}></div>
           ))}
         </div>
       </div>
       
-      <div className="relative z-10 w-full flex items-center justify-center mt-20 md:mt-16 px-4">
+      {/* SwipeCard Area */}
+      <div className="relative z-10 w-full flex-1 flex items-center justify-center px-4 min-h-0 my-3 md:my-6">
         {currentMovie && (
           <SwipeCard 
             key={currentMovie.id} 
@@ -252,24 +254,25 @@ export default function Home() {
         )}
       </div>
 
-      <div className="fixed bottom-8 flex z-20 bg-white/5 backdrop-blur-2xl border border-white/10 p-3 rounded-[2rem] gap-4 md:gap-6 shadow-[0_20px_40px_rgba(0,0,0,0.6)]">
+      {/* Bottom Buttons */}
+      <div className="flex z-20 bg-white/5 backdrop-blur-2xl border border-white/10 p-2.5 md:p-3 rounded-[2rem] gap-4 md:gap-6 shadow-[0_20px_40px_rgba(0,0,0,0.6)] shrink-0">
         <button 
           onClick={() => handleRate(currentMovie.id, 1.0)} 
-          className="w-[4.5rem] h-[3.5rem] md:w-[5.5rem] md:h-[4rem] bg-gray-950/80 border border-red-500/30 rounded-[1.25rem] flex items-center justify-center text-red-500 text-2xl shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_25px_rgba(239,68,68,0.4)] hover:bg-red-500/10 transition-all active:scale-95"
+          className="w-[3.5rem] h-[3rem] md:w-[5.5rem] md:h-[4rem] bg-gray-950/80 border border-red-500/30 rounded-[1rem] md:rounded-[1.25rem] flex items-center justify-center text-red-500 text-xl md:text-2xl shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_25px_rgba(239,68,68,0.4)] hover:bg-red-500/10 transition-all active:scale-95"
           title="No me gusta"
         >
           ❌
         </button>
         <button 
           onClick={() => handleRate(currentMovie.id, null)} 
-          className="w-[4.5rem] h-[3.5rem] md:w-[5.5rem] md:h-[4rem] bg-gray-950/80 border border-gray-400/30 rounded-[1.25rem] flex items-center justify-center text-gray-400 text-3xl shadow-[0_0_15px_rgba(156,163,175,0.1)] hover:shadow-[0_0_25px_rgba(156,163,175,0.4)] hover:bg-gray-400/10 transition-all active:scale-95 pb-1"
+          className="w-[3.5rem] h-[3rem] md:w-[5.5rem] md:h-[4rem] bg-gray-950/80 border border-gray-400/30 rounded-[1rem] md:rounded-[1.25rem] flex items-center justify-center text-gray-400 text-2xl md:text-3xl shadow-[0_0_15px_rgba(156,163,175,0.1)] hover:shadow-[0_0_25px_rgba(156,163,175,0.4)] hover:bg-gray-400/10 transition-all active:scale-95 pb-1"
           title="No la he visto"
         >
           👁️‍🗨️
         </button>
         <button 
           onClick={() => handleRate(currentMovie.id, 5.0)} 
-          className="w-[4.5rem] h-[3.5rem] md:w-[5.5rem] md:h-[4rem] bg-gray-950/80 border border-green-500/30 rounded-[1.25rem] flex items-center justify-center text-green-500 text-3xl shadow-[0_0_15px_rgba(34,197,94,0.1)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)] hover:bg-green-500/10 transition-all active:scale-95"
+          className="w-[3.5rem] h-[3rem] md:w-[5.5rem] md:h-[4rem] bg-gray-950/80 border border-green-500/30 rounded-[1rem] md:rounded-[1.25rem] flex items-center justify-center text-green-500 text-2xl md:text-3xl shadow-[0_0_15px_rgba(34,197,94,0.1)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)] hover:bg-green-500/10 transition-all active:scale-95"
           title="Me gusta"
         >
           💚
