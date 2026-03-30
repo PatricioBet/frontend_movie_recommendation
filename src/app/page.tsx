@@ -44,7 +44,7 @@ function RecommendationCard({ movie, isTrending = false }: RecommendationCardPro
       const fetchPoster = async () => {
         try {
           const query = encodeURIComponent(movie.title);
-          const apiKey = "15d2ea6d0dc1d476efbca3eba2b9bbfb"; // Public test API Key for TMDB
+          const apiKey = "15d2ea6d0dc1d476efbca3eba2b9bbfb";
           const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${query}&language=es-MX`);
           const data = await res.json();
           if (data.results && data.results.length > 0 && data.results[0].poster_path) {
@@ -263,6 +263,17 @@ export default function Home() {
             </button>
           </div>
 
+          <section>
+            <h2 className="text-2xl font-black mb-4 text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-fuchsia-300 drop-shadow-[0_0_15px_rgba(236,72,153,0.35)] tracking-tight">
+              Tus Mejores Recomendaciones
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
+              {recommendations.map((mov: ExtendedMovie) => (
+                <RecommendationCard key={mov.id} movie={mov} />
+              ))}
+            </div>
+          </section>
+
           {trendingMovies.length > 0 && (
             <section>
               <h2 className="text-2xl font-black mb-4 text-transparent bg-clip-text bg-linear-to-r from-cyan-300 to-blue-500 drop-shadow-[0_0_15px_rgba(56,189,248,0.4)] tracking-tight flex items-center gap-2">
@@ -275,17 +286,6 @@ export default function Home() {
               </div>
             </section>
           )}
-
-          <section>
-            <h2 className="text-2xl font-black mb-4 text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-fuchsia-300 drop-shadow-[0_0_15px_rgba(236,72,153,0.35)] tracking-tight">
-              Tus Mejores Recomendaciones
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
-              {recommendations.map((mov: ExtendedMovie) => (
-                <RecommendationCard key={mov.id} movie={mov} />
-              ))}
-            </div>
-          </section>
         </div>
       </div>
     );
