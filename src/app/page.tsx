@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import SwipeCard, { Movie } from "@/components/SwipeCard";
 
 const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
@@ -54,57 +55,61 @@ function RecommendationCard({ movie, isTrending = false }: RecommendationCardPro
         }
       };
       fetchPoster();
-    } else {
-        setPosterUrl(movie.poster_url);
     }
   }, [movie]);
 
   return (
-    <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.4)] group hover:border-pink-500/50 transition-all duration-300 flex flex-col h-full min-h-[400px]">
-      <div className="h-[14rem] sm:h-[18rem] shrink-0 bg-gray-900/50 relative overflow-hidden">
+    <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.35)] group hover:border-pink-500/50 transition-all duration-300 flex flex-col h-full min-h-80">
+      <div className="h-44 sm:h-52 shrink-0 bg-gray-900/50 relative overflow-hidden">
          {posterUrl ? (
-           <img src={posterUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={movie.title} />
+           <Image
+             src={posterUrl}
+             alt={movie.title}
+             fill
+             sizes="(max-width: 640px) 100vw, 420px"
+             className="object-cover group-hover:scale-105 transition-transform duration-500"
+           />
          ) : (
            <div className="flex items-center justify-center h-full text-5xl opacity-50">🎥</div>
          )}
-         <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/40 to-transparent"></div>
+         <div className="absolute inset-0 bg-linear-to-t from-gray-950 via-gray-900/40 to-transparent"></div>
       </div>
-      <div className="p-6 relative -mt-8 z-10 flex flex-col flex-1 h-full">
-        <h3 className="text-2xl font-black text-white drop-shadow-md leading-tight">{movie.title} {movie.year && <span className="text-sm font-medium text-gray-400">({movie.year})</span>}</h3>
+      <div className="p-4 sm:p-5 relative -mt-6 z-10 flex flex-col flex-1 h-full">
+        <h3 className="text-xl sm:text-2xl font-black text-white drop-shadow-md leading-tight">{movie.title} {movie.year && <span className="text-xs sm:text-sm font-medium text-gray-400">({movie.year})</span>}</h3>
         
         {isTrending && totalRatings > 0 && (
-           <div className="mt-2 inline-flex items-center bg-white/10 backdrop-blur-md px-3 py-1 rounded-full border border-white/20 shadow-sm">
-             <span className="text-sm font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-cyan-400">
+           <div className="mt-2 inline-flex items-center bg-white/10 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/20 shadow-sm">
+             <span className="text-xs sm:text-sm font-bold bg-clip-text text-transparent bg-linear-to-r from-green-400 to-cyan-400">
                 {acceptancePercent}% Aceptación
              </span>
-             <span className="text-xs text-gray-400 ml-2">({totalRatings} valoraciones)</span>
+             <span className="text-[11px] text-gray-400 ml-2">({totalRatings} valoraciones)</span>
            </div>
         )}
-        <p className="text-sm font-semibold text-cyan-400 mt-1 drop-shadow-sm">{movie.genres}</p>
-        <p className="text-gray-300 mt-3 text-sm line-clamp-3 leading-relaxed">{movie.description || "Descripción no disponible para este título."}</p>
-        <div className="mt-auto pt-4 space-y-3">
+        <p className="text-xs sm:text-sm font-semibold text-cyan-400 mt-1 drop-shadow-sm">{movie.genres}</p>
+        <p className="text-gray-300 mt-2 text-sm line-clamp-2 leading-relaxed">{movie.description || "Descripción no disponible para este título."}</p>
+        <div className="mt-auto pt-3 space-y-2.5">
           <a 
             href={`https://www.youtube.com/results?search_query=${encodeURIComponent(movie.title + ' trailer español')}`} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="block w-full text-center bg-gradient-to-r from-pink-500 to-cyan-500 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_20px_rgba(236,72,153,0.6)] hover:scale-[1.02] transition-all active:scale-95"
+            className="block w-full text-center bg-linear-to-r from-pink-500 to-cyan-500 text-white text-sm font-bold py-2.5 rounded-xl shadow-[0_0_15px_rgba(236,72,153,0.3)] hover:shadow-[0_0_20px_rgba(236,72,153,0.6)] hover:scale-[1.02] transition-all active:scale-95"
           >
             Ver Tráiler
           </a>
           
           {!isTrending && (
-            <div className="flex gap-2 w-full mt-3">
+            <div className="flex gap-2 w-full mt-2">
               <button 
                 onClick={() => handleRateRec(false)} 
                 disabled={rated}
-                className={`flex-1 py-2 rounded-xl font-bold transition-all ${rated ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700' : 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 active:scale-95'}`}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${rated ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700' : 'bg-red-500/10 text-red-400 border border-red-500/30 hover:bg-red-500/20 hover:border-red-500/50 active:scale-95'}`}
               >
                 👎 Mala
               </button>
               <button 
                 onClick={() => handleRateRec(true)} 
                 disabled={rated}
-                className={`flex-1 py-2 rounded-xl font-bold transition-all ${rated ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700' : 'bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500/20 hover:border-green-500/50 active:scale-95'}`}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${rated ? 'bg-gray-800 text-gray-500 cursor-not-allowed border border-gray-700' : 'bg-green-500/10 text-green-400 border border-green-500/30 hover:bg-green-500/20 hover:border-green-500/50 active:scale-95'}`}
               >
                 👍 Buena
               </button>
@@ -126,28 +131,7 @@ export default function Home() {
   const [ratingsCount, setRatingsCount] = useState(0);
   const [showInfo, setShowInfo] = useState(true);
 
-  useEffect(() => {
-    const initUser = async () => {
-      try {
-        const username = `user_${Math.floor(Math.random() * 100000)}`;
-        const res = await fetch(`${API_URL}/users/`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ username }),
-        });
-        const data = await res.json();
-        setUserId(data.id);
-        
-        fetchRandomMovies();
-      } catch (err) {
-        console.error("Failed to initialize user", err);
-      }
-    };
-    
-    initUser();
-  }, []);
-
-  const fetchRandomMovies = async () => {
+  async function fetchRandomMovies() {
     try {
       const res = await fetch(`${API_URL}/movies/random?limit=30`);
       if (res.ok) {
@@ -166,7 +150,28 @@ export default function Home() {
             poster_url: '', description: 'Muestra', year: 2026
         })));
     }
-  };
+  }
+
+  useEffect(() => {
+    const initUser = async () => {
+      try {
+        const username = `user_${Math.floor(Math.random() * 100000)}`;
+        const res = await fetch(`${API_URL}/users/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username }),
+        });
+        const data = await res.json();
+        setUserId(data.id);
+
+        fetchRandomMovies();
+      } catch (err) {
+        console.error("Failed to initialize user", err);
+      }
+    };
+
+    initUser();
+  }, []);
 
   const handleRate = async (movieId: number, rating: number | null) => {
     let currentRatings = ratingsCount;
@@ -226,24 +231,24 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center">
         <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mb-6 shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
-        <div className="animate-pulse text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-cyan-400 text-2xl font-black tracking-widest drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">INICIALIZANDO CINEMA AI</div>
+        <div className="animate-pulse text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-cyan-400 text-2xl font-black tracking-widest drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">INICIALIZANDO CINEMA AI</div>
       </div>
     );
   }
 
   if (recommendations.length > 0) {
     return (
-      <div className="min-h-screen bg-slate-950 text-white p-6 md:p-12 relative overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-pink-500/10 rounded-full blur-[120px] pointer-events-none"></div>
-        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+      <div className="min-h-screen bg-slate-950 text-white p-4 md:p-8 relative overflow-hidden">
+        <div className="absolute top-0 left-1/4 w-125 h-125 bg-pink-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-0 right-1/4 w-125 h-125 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
         
-        <div className="relative z-10 max-w-[1400px] mx-auto flex flex-col xl:flex-row gap-12">
+        <div className="relative z-10 max-w-310 mx-auto flex flex-col xl:flex-row gap-8 xl:gap-10">
           {/* Section 1: Recommendations */}
           <div className="flex-1">
-             <h1 className="text-4xl md:text-5xl font-black mb-8 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.4)] tracking-tight">
+             <h1 className="text-3xl md:text-4xl font-black mb-6 text-transparent bg-clip-text bg-linear-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.4)] tracking-tight">
                Tus Mejores Recomendaciones
              </h1>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
                {recommendations.map((mov: ExtendedMovie) => (
                  <RecommendationCard key={mov.id} movie={mov} />
                ))}
@@ -252,11 +257,11 @@ export default function Home() {
           
           {/* Section 2: Trending */}
           {trendingMovies.length > 0 && (
-          <div className="w-full xl:w-[450px] shrink-0 border-t xl:border-t-0 xl:border-l border-white/10 pt-10 xl:pt-0 xl:pl-10">
-             <h2 className="text-3xl font-black mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-500 drop-shadow-[0_0_15px_rgba(56,189,248,0.4)] tracking-tight flex items-center gap-3">
+           <div className="w-full xl:w-90 shrink-0 border-t xl:border-t-0 xl:border-l border-white/10 pt-6 xl:pt-0 xl:pl-8">
+             <h2 className="text-2xl font-black mb-6 text-transparent bg-clip-text bg-linear-to-r from-cyan-300 to-blue-500 drop-shadow-[0_0_15px_rgba(56,189,248,0.4)] tracking-tight flex items-center gap-2">
                🔥 En Tendencia
              </h2>
-             <div className="flex flex-col gap-8">
+             <div className="flex flex-col gap-5">
                 {trendingMovies.map((mov: ExtendedMovie) => (
                   <RecommendationCard key={mov.id} movie={mov} isTrending={true} />
                 ))}
@@ -271,11 +276,11 @@ export default function Home() {
   if (fetchingRecs) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center flex-col relative overflow-hidden">
-         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950"></div>
+         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950"></div>
          <div className="relative z-10 w-24 h-24 border-4 border-pink-500 border-t-cyan-400 rounded-full animate-spin mb-8 shadow-[0_0_30px_rgba(236,72,153,0.6)]"></div>
-         <p className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-cyan-400 text-xl font-bold animate-pulse tracking-wide text-center px-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
+         <p className="relative z-10 text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-cyan-400 text-lg md:text-xl font-bold animate-pulse tracking-wide text-center px-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
            Ejecutando Modelo Neuronal... <br/>
-           <span className="text-sm font-medium text-gray-400 mt-2 block">Analizando tus preferencias para encontrar tus mejores matches</span>
+           <span className="text-xs md:text-sm font-medium text-gray-400 mt-2 block">Analizando tus preferencias para encontrar tus mejores matches</span>
          </p>
       </div>
     );
@@ -284,21 +289,21 @@ export default function Home() {
   const currentMovie = movies[currentIndex];
 
   return (
-    <div className="h-[100dvh] bg-slate-950 flex flex-col items-center justify-between overflow-hidden relative font-sans pt-6 pb-6 md:pt-10 md:pb-8">
+    <div className="h-dvh bg-slate-950 flex flex-col items-center justify-between overflow-hidden relative font-sans pt-4 pb-4 md:pt-6 md:pb-6">
       
       {/* Ambient background glows */}
-      <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-pink-500/10 rounded-full blur-[100px] pointer-events-none"></div>
-      <div className="absolute -bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute top-1/4 left-1/4 w-100 h-100 bg-pink-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+      <div className="absolute -bottom-1/4 right-1/4 w-100 h-100 bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       {showInfo && (
-        <div className="absolute top-4 left-4 right-4 md:left-auto md:right-4 z-50 md:w-96 bg-gray-900/90 backdrop-blur-xl border border-pink-500/50 p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform animate-in slide-in-from-top-4 fade-in duration-300 flex flex-col h-full min-h-[400px]">
-          <div className="flex justify-between items-start mb-3">
-            <h3 className="text-white font-extrabold text-lg flex items-center gap-2">
+        <div className="absolute top-3 left-3 right-3 md:left-auto md:right-4 z-50 md:w-90 bg-gray-900/90 backdrop-blur-xl border border-pink-500/50 p-4 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform animate-in slide-in-from-top-4 fade-in duration-300">
+          <div className="flex justify-between items-start mb-2">
+            <h3 className="text-white font-extrabold text-base md:text-lg flex items-center gap-2">
               <span className="text-2xl">🍿</span> ¿Cómo funciona?
             </h3>
             <button onClick={() => setShowInfo(false)} className="text-gray-400 hover:text-white transition-colors bg-white/5 rounded-full w-8 h-8 flex items-center justify-center">✕</button>
           </div>
-          <p className="text-gray-300 text-sm leading-relaxed font-medium">
+          <p className="text-gray-300 text-xs md:text-sm leading-relaxed font-medium">
             Para darte recomendaciones personalizadas con nuestra IA, necesitamos conocer tus gustos primero. 
             <br/><br/>
             Califica <strong className="text-pink-400 text-base">10 películas</strong> deslizando la tarjeta o usando los botones inferiores. 
@@ -309,12 +314,12 @@ export default function Home() {
       )}
 
       {/* Top Header Area */}
-      <div className="w-full px-2 md:px-4 z-20 flex flex-col items-center shrink-0">
-        <h1 className="text-3xl md:text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)] mb-3 md:mb-4 tracking-tight text-center leading-tight">
+      <div className="w-full max-w-4xl px-3 md:px-5 z-20 flex flex-col items-center shrink-0">
+        <h1 className="text-2xl md:text-4xl font-black text-transparent bg-clip-text bg-linear-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)] mb-2 md:mb-3 tracking-tight text-center leading-tight">
           Descubre Películas
         </h1>
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 px-3 md:px-5 py-2 rounded-full shadow-lg inline-block max-w-[95%] text-center">
-          <p className="text-gray-300 text-[10px] md:text-xs font-semibold tracking-wider flex items-center justify-center gap-1.5 md:gap-3 flex-wrap leading-relaxed">
+        <div className="bg-white/5 backdrop-blur-md border border-white/10 px-3 md:px-4 py-1.5 rounded-full shadow-lg inline-block max-w-[95%] text-center">
+          <p className="text-gray-300 text-[10px] md:text-xs font-semibold tracking-wide flex items-center justify-center gap-1.5 md:gap-2.5 flex-wrap leading-relaxed">
             <span className="whitespace-nowrap">Derecha {'>'} <span className="text-green-400 ml-0.5">💚</span></span>
             <span className="text-gray-600 hidden sm:inline">|</span><span className="text-gray-600 sm:hidden">&bull;</span>
             <span className="whitespace-nowrap">{'<'} Izquierda <span className="text-red-400 ml-0.5">❌</span></span>
@@ -322,15 +327,16 @@ export default function Home() {
             <span className="whitespace-nowrap">^ Arriba <span className="text-gray-400 font-normal ml-0.5">👁️</span></span>
           </p>
         </div>
-        <div className="mt-4 md:mt-8 flex justify-center gap-1.5 md:gap-2">
+        <p className="mt-2 text-xs text-gray-400">Has calificado {ratingsCount}/10 películas</p>
+        <div className="mt-3 md:mt-4 flex justify-center gap-1.5 md:gap-2">
           {Array.from({ length: 10 }).map((_, idx) => (
-            <div key={idx} className={`h-1.5 rounded-full transition-all duration-500 ${idx === ratingsCount ? 'w-6 md:w-8 bg-gradient-to-r from-cyan-400 to-pink-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]' : idx < ratingsCount ? 'w-2.5 md:w-3 bg-white/50' : 'w-2.5 md:w-3 bg-white/10'}`}></div>
+            <div key={idx} className={`h-1.5 rounded-full transition-all duration-500 ${idx === ratingsCount ? 'w-6 md:w-8 bg-linear-to-r from-cyan-400 to-pink-400 shadow-[0_0_10px_rgba(34,211,238,0.8)]' : idx < ratingsCount ? 'w-2.5 md:w-3 bg-white/50' : 'w-2.5 md:w-3 bg-white/10'}`}></div>
           ))}
         </div>
       </div>
       
       {/* SwipeCard Area */}
-      <div className="relative z-10 w-full flex-1 flex items-center justify-center px-4 min-h-0 my-3 md:my-6">
+      <div className="relative z-10 w-full flex-1 flex items-center justify-center px-3 md:px-4 min-h-0 my-2 md:my-3">
         {currentMovie && (
           <SwipeCard 
             key={currentMovie.id} 
@@ -341,24 +347,24 @@ export default function Home() {
       </div>
 
       {/* Bottom Buttons */}
-      <div className="flex z-20 bg-white/5 backdrop-blur-2xl border border-white/10 p-2.5 md:p-3 rounded-[2rem] gap-4 md:gap-6 shadow-[0_20px_40px_rgba(0,0,0,0.6)] shrink-0">
+      <div className="flex z-20 bg-white/5 backdrop-blur-2xl border border-white/10 p-2 md:p-2.5 rounded-[1.4rem] gap-2.5 md:gap-4 shadow-[0_20px_40px_rgba(0,0,0,0.6)] shrink-0">
         <button 
           onClick={() => handleRate(currentMovie.id, 1.0)} 
-          className="w-[3.5rem] h-[3rem] md:w-[5.5rem] md:h-[4rem] bg-gray-950/80 border border-red-500/30 rounded-[1rem] md:rounded-[1.25rem] flex items-center justify-center text-red-500 text-xl md:text-2xl shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_25px_rgba(239,68,68,0.4)] hover:bg-red-500/10 transition-all active:scale-95"
+          className="w-13 h-11 md:w-18 md:h-14 bg-gray-950/80 border border-red-500/30 rounded-[0.9rem] md:rounded-[1.1rem] flex items-center justify-center text-red-500 text-lg md:text-2xl shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_25px_rgba(239,68,68,0.4)] hover:bg-red-500/10 transition-all active:scale-95"
           title="No me gusta"
         >
           ❌
         </button>
         <button 
           onClick={() => handleRate(currentMovie.id, null)} 
-          className="w-[3.5rem] h-[3rem] md:w-[5.5rem] md:h-[4rem] bg-gray-950/80 border border-gray-400/30 rounded-[1rem] md:rounded-[1.25rem] flex items-center justify-center text-gray-400 text-2xl md:text-3xl shadow-[0_0_15px_rgba(156,163,175,0.1)] hover:shadow-[0_0_25px_rgba(156,163,175,0.4)] hover:bg-gray-400/10 transition-all active:scale-95 pb-1"
+          className="w-13 h-11 md:w-18 md:h-14 bg-gray-950/80 border border-gray-400/30 rounded-[0.9rem] md:rounded-[1.1rem] flex items-center justify-center text-xl md:text-2xl text-gray-400 shadow-[0_0_15px_rgba(156,163,175,0.1)] hover:shadow-[0_0_25px_rgba(156,163,175,0.4)] hover:bg-gray-400/10 transition-all active:scale-95 pb-1"
           title="No la he visto"
         >
           👁️‍🗨️
         </button>
         <button 
           onClick={() => handleRate(currentMovie.id, 5.0)} 
-          className="w-[3.5rem] h-[3rem] md:w-[5.5rem] md:h-[4rem] bg-gray-950/80 border border-green-500/30 rounded-[1rem] md:rounded-[1.25rem] flex items-center justify-center text-green-500 text-2xl md:text-3xl shadow-[0_0_15px_rgba(34,197,94,0.1)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)] hover:bg-green-500/10 transition-all active:scale-95"
+          className="w-13 h-11 md:w-18 md:h-14 bg-gray-950/80 border border-green-500/30 rounded-[0.9rem] md:rounded-[1.1rem] flex items-center justify-center text-xl md:text-2xl text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.1)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)] hover:bg-green-500/10 transition-all active:scale-95"
           title="Me gusta"
         >
           💚

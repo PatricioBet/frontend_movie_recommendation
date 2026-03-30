@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import Image from "next/image";
 
 export interface Movie {
   id: number;
@@ -49,8 +50,6 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
   }, [isDragging]);
 
   useEffect(() => {
-    setPos({ x: 0, y: 0 });
-    
     if (!movie.poster_url && movie.title) {
       const fetchPoster = async () => {
         try {
@@ -66,8 +65,6 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
         }
       };
       fetchPoster();
-    } else {
-        setPosterUrl(movie.poster_url);
     }
   }, [movie]);
 
@@ -100,9 +97,9 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
   };
 
   return (
-    <div className={`relative w-full max-w-[340px] md:max-w-[380px] z-10 transition-transform ${isHinting ? 'animate-card-hint' : ''}`}>
+    <div className={`relative w-full max-w-72 md:max-w-80 z-10 transition-transform ${isHinting ? 'animate-card-hint' : ''}`}>
       <div
-        className="relative w-full rounded-[1.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden bg-white/20 backdrop-blur-2xl border border-white/30 touch-none select-none"
+        className="relative w-full rounded-[1.2rem] shadow-[0_20px_50px_rgba(0,0,0,0.45)] overflow-hidden bg-white/20 backdrop-blur-2xl border border-white/30 touch-none select-none"
         style={{
           transform: `translate3d(${x}px, ${y}px, 0) rotate(${x / 20}deg)`,
           cursor: isDragging ? 'grabbing' : 'grab',
@@ -113,32 +110,38 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
-        <div className="h-[40vh] min-h-[16rem] max-h-[25rem] sm:max-h-[28rem] w-full relative">
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-transparent to-transparent z-10 pointer-events-none"></div>
+        <div className="h-[47vh] min-h-56 max-h-88 sm:max-h-96 w-full relative">
+        <div className="absolute inset-0 bg-linear-to-t from-gray-900/95 via-transparent to-transparent z-10 pointer-events-none"></div>
         {posterUrl ? (
-          <img src={posterUrl} alt={movie.title} className="w-full h-full object-cover pointer-events-none border-b-0" />
+          <Image
+            src={posterUrl}
+            alt={movie.title}
+            fill
+            sizes="(max-width: 768px) 100vw, 380px"
+            className="object-cover pointer-events-none border-b-0"
+          />
         ) : (
            <div className="w-full h-full bg-gray-800 flex items-center justify-center">
              <span className="text-gray-500 text-6xl">🎥</span>
            </div>
         )}
       </div>
-      <div className="px-6 pb-6 pt-4 bg-transparent pointer-events-none relative z-20 -mt-20">
-        <h2 className="text-3xl font-extrabold text-white mb-1 drop-shadow-md tracking-tight leading-tight">
-          {movie.title} {movie.year && <span className="text-xl font-medium text-gray-300">({movie.year})</span>}
+      <div className="px-4 md:px-5 pb-4 md:pb-5 pt-3 bg-transparent pointer-events-none relative z-20 -mt-16 md:-mt-18">
+        <h2 className="text-2xl md:text-[1.7rem] font-extrabold text-white mb-1 drop-shadow-md tracking-tight leading-tight">
+          {movie.title} {movie.year && <span className="text-base md:text-lg font-medium text-gray-300">({movie.year})</span>}
         </h2>
-        <p className="text-sm font-semibold text-pink-400 mb-2 drop-shadow-sm">{movie.genres}</p>
-        <p className="text-gray-300/90 text-sm leading-relaxed line-clamp-2 sm:line-clamp-3">{movie.description || 'Descripción no disponible para este título.'}</p>
+        <p className="text-xs md:text-sm font-semibold text-pink-400 mb-1.5 drop-shadow-sm">{movie.genres}</p>
+        <p className="text-gray-300/90 text-xs md:text-sm leading-relaxed line-clamp-2">{movie.description || 'Descripción no disponible para este título.'}</p>
       </div>
       
       {/* Visual Feedback Overlays */}
-      <div className={`absolute top-12 right-6 border-[3px] border-green-400 text-green-400 text-3xl font-black px-4 py-1 rounded-xl transform rotate-12 transition-opacity duration-200 ${x > 50 && Math.abs(y) < 50 ? 'opacity-100' : 'opacity-0'} pointer-events-none bg-green-900/40 backdrop-blur-sm shadow-[0_0_20px_rgba(34,197,94,0.4)] z-30`}>
+      <div className={`absolute top-8 right-4 border-[3px] border-green-400 text-green-400 text-xl md:text-2xl font-black px-3 py-1 rounded-xl transform rotate-12 transition-opacity duration-200 ${x > 50 && Math.abs(y) < 50 ? 'opacity-100' : 'opacity-0'} pointer-events-none bg-green-900/40 backdrop-blur-sm shadow-[0_0_20px_rgba(34,197,94,0.4)] z-30`}>
         ME GUSTA
       </div>
-      <div className={`absolute top-12 left-6 border-[3px] border-red-500 text-red-500 text-3xl font-black px-4 py-1 rounded-xl transform -rotate-12 transition-opacity duration-200 ${x < -50 && Math.abs(y) < 50 ? 'opacity-100' : 'opacity-0'} pointer-events-none bg-red-900/40 backdrop-blur-sm shadow-[0_0_20px_rgba(239,68,68,0.4)] z-30`}>
+      <div className={`absolute top-8 left-4 border-[3px] border-red-500 text-red-500 text-xl md:text-2xl font-black px-3 py-1 rounded-xl transform -rotate-12 transition-opacity duration-200 ${x < -50 && Math.abs(y) < 50 ? 'opacity-100' : 'opacity-0'} pointer-events-none bg-red-900/40 backdrop-blur-sm shadow-[0_0_20px_rgba(239,68,68,0.4)] z-30`}>
         PASO
       </div>
-      <div className={`absolute bottom-32 left-0 right-0 mx-auto w-56 text-center border-[3px] border-gray-300 text-gray-300 text-2xl font-black px-4 py-2 rounded-xl transition-opacity duration-200 ${y < -50 && Math.abs(x) < 50 ? 'opacity-100' : 'opacity-0'} pointer-events-none bg-gray-900/60 backdrop-blur-sm z-30`}>
+      <div className={`absolute bottom-24 left-0 right-0 mx-auto w-44 md:w-52 text-center border-[3px] border-gray-300 text-gray-300 text-lg md:text-xl font-black px-3 py-2 rounded-xl transition-opacity duration-200 ${y < -50 && Math.abs(x) < 50 ? 'opacity-100' : 'opacity-0'} pointer-events-none bg-gray-900/60 backdrop-blur-sm z-30`}>
         NO LA HE VISTO
       </div>
       </div>
