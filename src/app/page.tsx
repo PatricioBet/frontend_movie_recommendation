@@ -227,6 +227,14 @@ export default function Home() {
     setFetchingRecs(false);
   };
 
+  const handleBackToRating = async () => {
+    setRecommendations([]);
+    setTrendingMovies([]);
+    setRatingsCount(0);
+    setCurrentIndex(0);
+    await fetchRandomMovies();
+  };
+
   if (!userId || movies.length === 0) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center">
@@ -242,32 +250,42 @@ export default function Home() {
         <div className="absolute top-0 left-1/4 w-125 h-125 bg-pink-500/10 rounded-full blur-[120px] pointer-events-none"></div>
         <div className="absolute bottom-0 right-1/4 w-125 h-125 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
         
-        <div className="relative z-10 max-w-310 mx-auto flex flex-col xl:flex-row gap-8 xl:gap-10">
-          {/* Section 1: Recommendations */}
-          <div className="flex-1">
-             <h1 className="text-3xl md:text-4xl font-black mb-6 text-transparent bg-clip-text bg-linear-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.4)] tracking-tight">
-               Tus Mejores Recomendaciones
-             </h1>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
-               {recommendations.map((mov: ExtendedMovie) => (
-                 <RecommendationCard key={mov.id} movie={mov} />
-               ))}
-             </div>
+        <div className="relative z-10 max-w-310 mx-auto flex flex-col gap-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h1 className="text-3xl md:text-4xl font-black text-transparent bg-clip-text bg-linear-to-r from-pink-400 via-purple-400 to-cyan-400 drop-shadow-[0_0_15px_rgba(236,72,153,0.4)] tracking-tight">
+              Tus Resultados
+            </h1>
+            <button
+              onClick={handleBackToRating}
+              className="self-start sm:self-auto px-4 py-2 rounded-xl text-sm font-bold border border-cyan-400/40 bg-cyan-400/10 text-cyan-200 hover:bg-cyan-400/20 hover:border-cyan-300/60 transition-all"
+            >
+              Volver a calificar
+            </button>
           </div>
-          
-          {/* Section 2: Trending */}
+
           {trendingMovies.length > 0 && (
-           <div className="w-full xl:w-90 shrink-0 border-t xl:border-t-0 xl:border-l border-white/10 pt-6 xl:pt-0 xl:pl-8">
-             <h2 className="text-2xl font-black mb-6 text-transparent bg-clip-text bg-linear-to-r from-cyan-300 to-blue-500 drop-shadow-[0_0_15px_rgba(56,189,248,0.4)] tracking-tight flex items-center gap-2">
-               🔥 En Tendencia
-             </h2>
-             <div className="flex flex-col gap-5">
+            <section>
+              <h2 className="text-2xl font-black mb-4 text-transparent bg-clip-text bg-linear-to-r from-cyan-300 to-blue-500 drop-shadow-[0_0_15px_rgba(56,189,248,0.4)] tracking-tight flex items-center gap-2">
+                🔥 En Tendencia
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
                 {trendingMovies.map((mov: ExtendedMovie) => (
                   <RecommendationCard key={mov.id} movie={mov} isTrending={true} />
                 ))}
-             </div>
-          </div>
+              </div>
+            </section>
           )}
+
+          <section>
+            <h2 className="text-2xl font-black mb-4 text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-fuchsia-300 drop-shadow-[0_0_15px_rgba(236,72,153,0.35)] tracking-tight">
+              Tus Mejores Recomendaciones
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 md:gap-6">
+              {recommendations.map((mov: ExtendedMovie) => (
+                <RecommendationCard key={mov.id} movie={mov} />
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     );
