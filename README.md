@@ -7,7 +7,11 @@
   <img src="https://img.shields.io/badge/Database-PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL">
 </p>
 
+
+
 **Star Recs** es una aplicación full-stack que transforma la búsqueda de películas en una experiencia interactiva. Utilizando una dinámica de **swipe** (estilo Tinder), el sistema recolecta feedback del usuario en tiempo real para alimentar un modelo de **Neural Collaborative Filtering (NCF)** y entregar recomendaciones altamente personalizadas.
+
+Pruebalo en: https://star-recs.patriciobet.dev/
 
 ---
 
