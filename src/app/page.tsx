@@ -60,8 +60,8 @@ function RecommendationCard({ movie, isTrending = false }: RecommendationCardPro
   }, [movie]);
 
   return (
-    <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.4)] group hover:border-pink-500/50 transition-all duration-300">
-      <div className="h-[20rem] sm:h-[24rem] bg-gray-900/50 relative overflow-hidden">
+    <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl overflow-hidden shadow-[0_10px_30px_rgba(0,0,0,0.4)] group hover:border-pink-500/50 transition-all duration-300 flex flex-col h-full min-h-[400px]">
+      <div className="h-[14rem] sm:h-[18rem] shrink-0 bg-gray-900/50 relative overflow-hidden">
          {posterUrl ? (
            <img src={posterUrl} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={movie.title} />
          ) : (
@@ -69,7 +69,7 @@ function RecommendationCard({ movie, isTrending = false }: RecommendationCardPro
          )}
          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/40 to-transparent"></div>
       </div>
-      <div className="p-6 relative -mt-16 z-10 flex flex-col h-full">
+      <div className="p-6 relative -mt-8 z-10 flex flex-col flex-1 h-full">
         <h3 className="text-2xl font-black text-white drop-shadow-md leading-tight">{movie.title} {movie.year && <span className="text-sm font-medium text-gray-400">({movie.year})</span>}</h3>
         
         {isTrending && totalRatings > 0 && (
@@ -291,7 +291,7 @@ export default function Home() {
       <div className="absolute -bottom-1/4 right-1/4 w-[400px] h-[400px] bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none"></div>
 
       {showInfo && (
-        <div className="absolute top-4 left-4 right-4 md:left-auto md:right-4 z-50 md:w-96 bg-gray-900/90 backdrop-blur-xl border border-pink-500/50 p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform animate-in slide-in-from-top-4 fade-in duration-300">
+        <div className="absolute top-4 left-4 right-4 md:left-auto md:right-4 z-50 md:w-96 bg-gray-900/90 backdrop-blur-xl border border-pink-500/50 p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] transform animate-in slide-in-from-top-4 fade-in duration-300 flex flex-col h-full min-h-[400px]">
           <div className="flex justify-between items-start mb-3">
             <h3 className="text-white font-extrabold text-lg flex items-center gap-2">
               <span className="text-2xl">🍿</span> ¿Cómo funciona?
