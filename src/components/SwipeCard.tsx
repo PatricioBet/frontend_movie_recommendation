@@ -20,6 +20,7 @@ interface SwipeCardProps {
 export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
   const [{ x, y }, setPos] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
+  const [isRated, setIsRated] = useState(false);
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
   const [posterUrl, setPosterUrl] = useState<string | null>(movie.poster_url);
@@ -69,6 +70,8 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
   }, [movie]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
+    if (isRated) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
     setIsDragging(true);
     setStartX(e.clientX - x);
     setStartY(e.clientY - y);
@@ -81,15 +84,21 @@ export default function SwipeCard({ movie, onRate }: SwipeCardProps) {
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
+    if (isRated) return;
     setIsDragging(false);
-    e.currentTarget.releasePointerCapture(e.pointerId);
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
 
     const swipeThreshold = 100;
     if (x > swipeThreshold) {
+      setIsRated(true);
       onRate(movie.id, 5.0);
     } else if (x < -swipeThreshold) {
+      setIsRated(true);
       onRate(movie.id, 1.0);
     } else if (y < -swipeThreshold) {
+      setIsRated(true);
       onRate(movie.id, null); // null signifies "Haven't seen it"
     } else {
       setPos({ x: 0, y: 0 });

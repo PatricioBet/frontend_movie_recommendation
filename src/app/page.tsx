@@ -128,6 +128,7 @@ export default function Home() {
   const [recommendations, setRecommendations] = useState<ExtendedMovie[]>([]);
   const [trendingMovies, setTrendingMovies] = useState<ExtendedMovie[]>([]);
   const [fetchingRecs, setFetchingRecs] = useState(false);
+  const [isSubmittingRating, setIsSubmittingRating] = useState(false);
   const [ratingsCount, setRatingsCount] = useState(0);
   const [showInfo, setShowInfo] = useState(true);
 
@@ -174,6 +175,8 @@ export default function Home() {
   }, []);
 
   const handleRate = async (movieId: number, rating: number | null) => {
+    if (isSubmittingRating || fetchingRecs) return;
+    setIsSubmittingRating(true);
     let currentRatings = ratingsCount;
 
     if (userId && rating !== null) {
@@ -191,17 +194,21 @@ export default function Home() {
     }
 
     if (currentRatings >= 10) {
-      fetchRecommendations();
+      await fetchRecommendations();
     } else if (currentIndex < movies.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     } else {
-      fetchRandomMovies();
+      await fetchRandomMovies();
       setCurrentIndex(0);
     }
+
+    setIsSubmittingRating(false);
   };
 
   const fetchRecommendations = async () => {
     setFetchingRecs(true);
+    setRecommendations([]);
+    setTrendingMovies([]);
     try {
         await new Promise(res => setTimeout(res, 2000));
         const [recRes, trendRes] = await Promise.all([
@@ -240,6 +247,20 @@ export default function Home() {
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center">
         <div className="w-16 h-16 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin mb-6 shadow-[0_0_15px_rgba(34,211,238,0.5)]"></div>
         <div className="animate-pulse text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-cyan-400 text-2xl font-black tracking-widest drop-shadow-[0_0_10px_rgba(236,72,153,0.5)]">INICIALIZANDO CINEMA AI</div>
+      </div>
+    );
+  }
+
+  if (fetchingRecs) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center flex-col relative overflow-hidden">
+         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950"></div>
+         <div className="relative z-10 w-24 h-24 border-4 border-pink-500 border-t-cyan-400 rounded-full animate-spin mb-8 shadow-[0_0_30px_rgba(236,72,153,0.6)]"></div>
+         <p className="relative z-10 text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-cyan-400 text-lg md:text-xl font-bold animate-pulse tracking-wide text-center px-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
+           Ejecutando Modelo Neuronal... <br/>
+           <span className="text-xs md:text-sm font-medium text-gray-300 mt-2 block">Esto puede llevar unos segundos.</span>
+           <span className="text-xs md:text-sm font-medium text-gray-400 mt-1 block">Analizando tus preferencias para encontrar tus mejores matches</span>
+         </p>
       </div>
     );
   }
@@ -287,19 +308,6 @@ export default function Home() {
             </section>
           )}
         </div>
-      </div>
-    );
-  }
-
-  if (fetchingRecs) {
-    return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center flex-col relative overflow-hidden">
-         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-slate-950"></div>
-         <div className="relative z-10 w-24 h-24 border-4 border-pink-500 border-t-cyan-400 rounded-full animate-spin mb-8 shadow-[0_0_30px_rgba(236,72,153,0.6)]"></div>
-         <p className="relative z-10 text-transparent bg-clip-text bg-linear-to-r from-pink-400 to-cyan-400 text-lg md:text-xl font-bold animate-pulse tracking-wide text-center px-6 drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">
-           Ejecutando Modelo Neuronal... <br/>
-           <span className="text-xs md:text-sm font-medium text-gray-400 mt-2 block">Analizando tus preferencias para encontrar tus mejores matches</span>
-         </p>
       </div>
     );
   }
@@ -368,6 +376,7 @@ export default function Home() {
       <div className="flex z-20 bg-white/5 backdrop-blur-2xl border border-white/10 p-2 md:p-2.5 rounded-[1.4rem] gap-2.5 md:gap-4 shadow-[0_20px_40px_rgba(0,0,0,0.6)] shrink-0">
         <button 
           onClick={() => handleRate(currentMovie.id, 1.0)} 
+          disabled={isSubmittingRating || fetchingRecs}
           className="w-13 h-11 md:w-18 md:h-14 bg-gray-950/80 border border-red-500/30 rounded-[0.9rem] md:rounded-[1.1rem] flex items-center justify-center text-red-500 text-lg md:text-2xl shadow-[0_0_15px_rgba(239,68,68,0.1)] hover:shadow-[0_0_25px_rgba(239,68,68,0.4)] hover:bg-red-500/10 transition-all active:scale-95"
           title="No me gusta"
         >
@@ -375,6 +384,7 @@ export default function Home() {
         </button>
         <button 
           onClick={() => handleRate(currentMovie.id, null)} 
+          disabled={isSubmittingRating || fetchingRecs}
           className="w-13 h-11 md:w-18 md:h-14 bg-gray-950/80 border border-gray-400/30 rounded-[0.9rem] md:rounded-[1.1rem] flex items-center justify-center text-xl md:text-2xl text-gray-400 shadow-[0_0_15px_rgba(156,163,175,0.1)] hover:shadow-[0_0_25px_rgba(156,163,175,0.4)] hover:bg-gray-400/10 transition-all active:scale-95 pb-1"
           title="No la he visto"
         >
@@ -382,6 +392,7 @@ export default function Home() {
         </button>
         <button 
           onClick={() => handleRate(currentMovie.id, 5.0)} 
+          disabled={isSubmittingRating || fetchingRecs}
           className="w-13 h-11 md:w-18 md:h-14 bg-gray-950/80 border border-green-500/30 rounded-[0.9rem] md:rounded-[1.1rem] flex items-center justify-center text-xl md:text-2xl text-green-500 shadow-[0_0_15px_rgba(34,197,94,0.1)] hover:shadow-[0_0_25px_rgba(34,197,94,0.4)] hover:bg-green-500/10 transition-all active:scale-95"
           title="Me gusta"
         >
